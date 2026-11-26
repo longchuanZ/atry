@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>情感漠视量表 · 亲密关系版</title>
+<style>
+  :root{
+    --ink:#26506f;
+    --ink-2:#5b819d;
+    --ink-3:#8aaac1;
+    --blue:#4a90d9;
+    --line:rgba(255,255,255,.9);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(900px 620px at 10% -10%, #ffffff 0%, rgba(255,255,255,0) 62%),
+      radial-gradient(820px 700px at 96% 4%, #cfe9ff 0%, rgba(207,233,255,0) 58%),
+      radial-gradient(1000px 900px at 50% 118%, #b9dcf7 0%, rgba(185,220,247,0) 62%),
+      linear-gradient(168deg,#eaf6ff 0%,#dceffc 48%,#e9f5fd 100%);
+    background-attachment:fixed;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.7;
+  }
+  .app{max-width:720px;margin:0 auto;padding:44px 22px 110px;min-height:100vh;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:rise .5s cubic-bezier(.22,.9,.3,1) both;}
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ---------- 封面 ---------- */
+  .cover{text-align:center;padding-top:5vh;}
+  .kicker{display:inline-block;font-size:11.5px;letter-spacing:.28em;color:var(--ink-3);margin-bottom:24px;}
+  .cover h1{
+    margin:0 0 4px;font-size:clamp(2.05rem,7.2vw,3.2rem);
+    font-weight:650;letter-spacing:.10em;line-height:1.24;color:#2b5c8a;
+    text-shadow:0 2px 18px rgba(255,255,255,.9);
+  }
+  .cover h1 small{display:block;font-size:.34em;letter-spacing:.3em;color:#7ba3c1;font-weight:500;margin-top:14px;}
+  .rule{width:56px;height:3px;border-radius:3px;margin:24px auto 28px;background:linear-gradient(90deg,rgba(121,184,233,0),#79b8e9,rgba(121,184,233,0));}
+  .intro{font-size:14.5px;line-height:2.0;color:var(--ink-2);text-align:left;max-width:560px;margin:0 auto 12px;letter-spacing:.015em;}
+  .intro em{font-style:normal;color:#3d769f;}
+  .note-line{
+    max-width:560px;margin:18px auto 0;padding:12px 16px;font-size:12.5px;line-height:1.85;
+    color:#6d93ae;background:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.85);
+    border-radius:14px;text-align:left;
+  }
+  .quote{max-width:560px;margin:20px auto 0;padding:16px 20px;font-size:13.5px;color:var(--ink-2);line-height:1.9;background:rgba(255,255,255,.44);border:1px solid var(--line);border-radius:16px;}
+  .quote span{display:block;margin-top:8px;color:var(--ink-3);font-size:12px;letter-spacing:.06em;}
+  .meta{margin:32px 0 24px;font-size:12.5px;color:var(--ink-3);letter-spacing:.14em;}
+  .btn-start{
+    appearance:none;border:0;cursor:pointer;padding:17px 62px;border-radius:999px;
+    font-size:16px;font-weight:600;letter-spacing:.18em;color:#fff;font-family:inherit;
+    background:linear-gradient(135deg,#7cbdf0 0%,#4a90d9 100%);
+    box-shadow:0 12px 30px rgba(74,144,217,.32),0 2px 6px rgba(74,144,217,.22),inset 0 1px 0 rgba(255,255,255,.4);
+    transition:transform .22s ease, box-shadow .22s ease;
+  }
+  .btn-start:hover{transform:translateY(-2px);box-shadow:0 18px 38px rgba(74,144,217,.38),inset 0 1px 0 rgba(255,255,255,.4);}
+  .btn-start:active{transform:translateY(0) scale(.985);}
+
+  /* ---------- 答题 ---------- */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .counter{font-size:12.5px;letter-spacing:.16em;color:var(--ink-3);}
+  .counter b{color:#3d769f;font-weight:600;font-size:15px;letter-spacing:.08em;}
+  .back{appearance:none;border:0;background:transparent;cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--ink-3);letter-spacing:.08em;padding:6px 2px;transition:color .2s;}
+  .back:hover{color:#3d769f;}
+  .back[hidden]{display:block;visibility:hidden;}
+  .track{height:4px;border-radius:4px;background:rgba(255,255,255,.65);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.8);}
+  .bar{height:100%;width:0%;border-radius:4px;background:linear-gradient(90deg,#9ed2f5,#4a90d9);transition:width .45s cubic-bezier(.3,.9,.3,1);}
+  .qhead{margin:36px 0 24px;}
+  .qnum{font-size:11px;letter-spacing:.3em;color:#a8c4d8;margin-bottom:12px;}
+  .qtext{font-size:clamp(17px,4.6vw,19.5px);font-weight:600;line-height:1.62;color:#2c5678;letter-spacing:.01em;margin:0;}
+  .options{display:flex;flex-direction:column;gap:12px;}
+  .option{
+    display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;cursor:pointer;
+    font-family:inherit;font-size:15px;line-height:1.65;color:#39607f;
+    padding:16px 18px;border-radius:16px;border:1px solid rgba(255,255,255,.92);
+    background:rgba(255,255,255,.5);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:0 2px 10px rgba(110,160,200,.06);
+    transition:background .2s ease,border-color .2s ease,transform .2s ease,box-shadow .2s ease;
+    animation:rise .45s cubic-bezier(.22,.9,.3,1) both;
+  }
+  .option:nth-child(1){animation-delay:.04s}
+  .option:nth-child(2){animation-delay:.10s}
+  .option:nth-child(3){animation-delay:.16s}
+  .option:nth-child(4){animation-delay:.22s}
+  .option:hover{background:rgba(255,255,255,.82);border-color:#dff0fd;transform:translateY(-2px);box-shadow:0 10px 24px rgba(110,160,200,.13);}
+  .option .key{
+    flex:0 0 auto;width:24px;height:24px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-size:11.5px;font-weight:600;margin-top:1px;color:#8fb4cd;background:rgba(214,236,250,.75);
+    transition:background .2s,color .2s;
+  }
+  .option:hover .key{background:#dceffc;color:#4a90d9;}
+  .option .txt{flex:1;min-width:0;}
+  .option.picked{background:rgba(219,240,255,.92);border-color:#a8d4f2;box-shadow:0 8px 22px rgba(90,160,215,.2);transform:translateY(-2px);}
+  .option.picked .key{background:#4a90d9;color:#fff;}
+  .option.dim{opacity:.45;pointer-events:none;}
+
+  /* ---------- 报告通用 ---------- */
+  .result-head{text-align:center;margin-bottom:22px;}
+  .badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;}
+  .match{display:inline-block;font-size:11px;letter-spacing:.18em;color:#4a90d9;background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.95);padding:5px 14px;border-radius:999px;}
+  .match.lvl{color:#3d769f;background:rgba(224,242,255,.88);}
+  .result-head h2{margin:0 0 10px;font-size:clamp(1.32rem,5.6vw,1.95rem);font-weight:650;letter-spacing:.04em;color:#2b5c8a;line-height:1.45;}
+  .result-head h2 .sev{color:#4a90d9;}
+  .result-head h2 .dot-sep{color:#a8c4d8;margin:0 3px;font-weight:400;}
+  .path{font-size:12px;letter-spacing:.22em;color:var(--ink-3);margin-bottom:16px;}
+  .tagline{font-size:15.5px;line-height:1.9;color:#3d6d92;max-width:520px;margin:0 auto;letter-spacing:.01em;}
+  .panel{
+    background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.92);border-radius:22px;
+    padding:24px 22px;margin-bottom:15px;box-shadow:0 6px 24px rgba(110,160,200,.09);
+  }
+  .panel h3{margin:0 0 16px;font-size:13px;font-weight:600;letter-spacing:.16em;color:#3d769f;display:flex;align-items:center;gap:9px;}
+  .h3bar{display:inline-block;width:3px;height:13px;border-radius:2px;background:linear-gradient(180deg,#9ed2f5,#4a90d9);flex:0 0 3px;}
+  .panel p{margin:0;font-size:14.5px;line-height:1.95;color:#41678a;}
+  .panel p + p{margin-top:12px;}
+
+  /* 结论卡 */
+  .verdict{
+    background:linear-gradient(150deg,rgba(255,255,255,.9),rgba(233,246,255,.75));
+    border:1px solid rgba(255,255,255,.95);border-radius:22px;padding:24px 22px;margin-bottom:15px;
+    box-shadow:0 8px 28px rgba(110,160,200,.12);
+  }
+  .verdict .vlabel{font-size:10.5px;letter-spacing:.3em;color:#8fb4cd;margin-bottom:10px;}
+  .verdict .vtext{font-size:16px;line-height:1.95;color:#2f5a7d;font-weight:500;letter-spacing:.01em;}
+  .verdict .vsub{margin-top:13px;padding-top:13px;border-top:1px solid rgba(200,228,248,.75);font-size:13px;line-height:1.9;color:#6d93ae;}
+
+  /* 雷达 */
+  .radar-wrap{display:flex;justify-content:center;padding:2px 0 12px;}
+  #radar{display:block;width:min(100%,300px);height:auto;aspect-ratio:1/1;}
+  .dims{display:flex;flex-direction:column;gap:12px;margin-top:4px;}
+  .dim-row{display:flex;align-items:center;gap:12px;}
+  .dim-name{flex:0 0 62px;font-size:12.5px;color:#5b819d;letter-spacing:.04em;}
+  .dim-track{flex:1;height:6px;border-radius:6px;background:rgba(219,240,255,.85);overflow:hidden;}
+  .dim-fill{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,#a9d9f7,#4a90d9);transition:width .9s cubic-bezier(.3,.9,.3,1);}
+  .dim-val{flex:0 0 38px;text-align:right;font-size:12px;color:#7fa3bd;font-variant-numeric:tabular-nums;}
+  .dim-notes{margin-top:18px;padding-top:14px;border-top:1px solid rgba(210,232,248,.9);}
+  .dim-note{font-size:12.8px;line-height:1.9;color:#6d93ae;margin-bottom:9px;}
+  .dim-note b{color:#3d769f;font-weight:600;}
+
+  /* 关系姿态 */
+  .stance{display:flex;gap:16px;align-items:flex-start;}
+  .stance-badge{
+    flex:0 0 auto;padding:10px 16px;border-radius:14px;font-size:14px;font-weight:600;color:#2f6a9c;
+    background:linear-gradient(140deg,rgba(220,240,255,.95),rgba(190,225,250,.85));
+    border:1px solid rgba(255,255,255,.95);white-space:nowrap;letter-spacing:.04em;
+  }
+  .stance p{font-size:14px;line-height:1.9;}
+
+  /* 循环 */
+  .loop{margin:0;padding:0;list-style:none;counter-reset:lp;}
+  .loop li{
+    position:relative;padding-left:38px;font-size:14px;line-height:1.9;color:#41678a;margin-bottom:14px;
+  }
+  .loop li:last-child{margin-bottom:0;}
+  .loop li .dot{
+    position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;
+    color:#4a90d9;background:rgba(219,240,255,.95);border:1px solid rgba(255,255,255,.95);
+  }
+  .loop li:last-child .dot{color:#fff;background:linear-gradient(135deg,#8cc6ef,#4a90d9);}
+
+  /* 镜像卡 */
+  .mirror{
+    padding:16px 18px;border-radius:16px;background:rgba(255,255,255,.62);
+    border:1px solid rgba(255,255,255,.95);margin-bottom:12px;
+  }
+  .mirror:last-child{margin-bottom:0;}
+  .mirror .who{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:10px;}
+  .mirror .cname{font-size:15.5px;font-weight:600;color:#2b5c8a;letter-spacing:.03em;}
+  .mirror .cwork{font-size:12px;color:#8fb4cd;letter-spacing:.06em;}
+  .mirror .mline{font-size:13.5px;line-height:1.9;color:#4a6f8c;margin:0 0 6px;}
+  .mirror .mline:last-child{margin-bottom:0;}
+  .mirror .mline b{font-weight:600;color:#3d769f;}
+
+  /* 列表 */
+  .plain{margin:0;padding:0;list-style:none;}
+  .plain li{position:relative;padding-left:26px;font-size:14px;line-height:1.9;color:#41678a;margin-bottom:11px;}
+  .plain li:last-child{margin-bottom:0;}
+  .li-dot{position:absolute;left:4px;top:11px;width:7px;height:7px;border-radius:50%;background:#a9d2ee;}
+  .li-dot.warm{background:#f0b98c;}
+  .li-dot.act{left:2px;top:8px;width:13px;height:13px;background:#dceffc;border:1px solid #a8d4f2;}
+  .risk .rtitle{font-weight:600;color:#3d6a8c;}
+
+  /* 页脚 */
+  .report-foot{margin-top:22px;padding-top:16px;border-top:1px dashed rgba(160,196,222,.5);font-size:11px;line-height:1.9;color:#9ab6c9;text-align:center;letter-spacing:.06em;}
+
+  /* 按钮 */
+  .actions{display:flex;gap:12px;margin-top:22px;}
+  .btn-ghost{
+    flex:1;appearance:none;cursor:pointer;font-family:inherit;padding:15px;border-radius:999px;
+    font-size:14px;letter-spacing:.1em;color:#4a90d9;background:rgba(255,255,255,.62);
+    border:1px solid rgba(255,255,255,.95);transition:background .2s,transform .2s;
+  }
+  .btn-ghost:hover{background:rgba(255,255,255,.92);transform:translateY(-1px);}
+  .fab{
+    position:fixed;left:16px;bottom:14px;z-index:97;display:none;
+    appearance:none;border:0;cursor:pointer;font-family:inherit;
+    padding:12px 20px;border-radius:999px;font-size:13.5px;letter-spacing:.08em;color:#fff;
+    background:linear-gradient(135deg,#8cc6ef,#4a90d9);
+    box-shadow:0 10px 24px rgba(74,144,217,.35),inset 0 1px 0 rgba(255,255,255,.35);
+  }
+  .fab.show{display:inline-block;}
+  .fab:disabled{opacity:.6;}
+  .fineprint{margin-top:18px;font-size:11.5px;line-height:1.9;color:#9ab6c9;text-align:center;letter-spacing:.02em;}
+
+  /* 水印 */
+  .watermark{
+    position:fixed;right:16px;bottom:12px;z-index:96;font-size:11px;letter-spacing:.14em;
+    color:rgba(93,133,168,.42);pointer-events:none;user-select:none;text-shadow:0 1px 6px rgba(255,255,255,.9);
+  }
+
+  /* 导出层 */
+  .export-layer{
+    position:fixed;inset:0;z-index:200;display:none;background:rgba(24,48,70,.86);
+    overflow:auto;padding:18px 14px 90px;
+  }
+  .export-layer.show{display:block;}
+  .export-layer img{display:block;width:100%;max-width:680px;margin:0 auto;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4);}
+  .export-tip{max-width:680px;margin:14px auto 0;text-align:center;font-size:12.5px;line-height:1.8;color:rgba(255,255,255,.82);}
+  .export-bar{
+    position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    display:flex;gap:10px;justify-content:center;background:linear-gradient(180deg,rgba(24,48,70,0),rgba(24,48,70,.95) 40%);
+  }
+  .export-bar a,.export-bar button{
+    appearance:none;border:0;cursor:pointer;font-family:inherit;font-size:14px;letter-spacing:.08em;
+    padding:13px 26px;border-radius:999px;text-decoration:none;display:inline-block;
+  }
+  .export-bar a{background:#fff;color:#2b5c8a;font-weight:600;}
+  .export-bar button{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.35);}
+  .toast{
+    position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:300;
+    background:rgba(30,56,80,.92);color:#fff;font-size:13px;padding:11px 20px;border-radius:999px;
+    opacity:0;transition:opacity .25s;pointer-events:none;max-width:86%;text-align:center;line-height:1.6;
+  }
+  .toast.show{opacity:1;}
+
+  @media (max-width:420px){
+    .app{padding:30px 16px 100px;}
+    .panel{padding:20px 17px;border-radius:19px;}
+    .verdict{padding:20px 17px;border-radius:19px;}
+    .option{font-size:14.5px;padding:15px 15px;}
+    .watermark{right:12px;bottom:9px;font-size:10px;}
+    .cover{padding-top:2vh;}
+    .dim-name{flex:0 0 54px;font-size:12px;}
+    .stance{flex-direction:column;gap:10px;}
+    .fab{left:12px;bottom:12px;padding:11px 17px;font-size:13px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ 封面 ============ -->
+  <section id="screen-cover" class="screen active">
+    <div class="cover">
+      <div class="kicker">EMOTIONAL APATHY · 亲密关系版</div>
+      <h1>情感漠视量表<small>你离我这么近，为什么我感觉不到你</small></h1>
+      <div class="rule"></div>
+
+      <p class="intro">
+        「情感漠视」不是一份诊断，而是一种描述——它指的是情绪的反应、识别与表达通道不通畅。
+        有人是<em>感受不到</em>，有人是<em>感受到了却说不出口</em>，也有人只是<em>不愿意让你看见</em>。
+        它几乎总在最近的关系里暴露：一句「你怎么了」，一个想被抱住的瞬间，一次「你到底爱不爱我」的追问。
+      </p>
+
+      <div class="note-line">
+        本量表聚焦<b>亲密关系</b>中的相处方式，<b>异性与同性伴侣均适用</b>。题目里的「TA / 伴侣」不预设性别。
+      </div>
+
+      <div class="quote">
+        「无回应之地，即是绝境。」
+        <span>—— 唐纳德·温尼科特</span>
+      </div>
+
+      <div class="meta">20 题 · 约 4 分钟 · 五维画像 · 七种关系原型 · 可保存长图</div>
+
+      <button class="btn-start" id="btn-start">开 始</button>
+    </div>
+  </section>
+
+  <!-- ============ 答题 ============ -->
+  <section id="screen-quiz" class="screen">
+    <div class="topbar">
+      <button class="back" id="btn-back" hidden>← 上一题</button>
+      <div class="counter"><b id="cur">1</b> / 20</div>
+    </div>
+    <div class="track"><div class="bar" id="bar"></div></div>
+    <div class="qhead">
+      <div class="qnum" id="qnum">QUESTION 01</div>
+      <h2 class="qtext" id="qtext"></h2>
+    </div>
+    <div class="options" id="options"></div>
+  </section>
+
+  <!-- ============ 结果 ============ -->
+  <section id="screen-result" class="screen">
+    <div id="report-root"></div>
+    <div class="actions">
+      <button class="btn-ghost" id="btn-retry">重新测一次</button>
+    </div>
+    <div class="fineprint">
+      本量表不是诊断工具，不构成任何医疗建议。<br>
+      如果这些描述让你感到痛苦，或已影响生活，请寻求精神科 / 临床心理科的专业帮助。
+    </div>
+  </section>
+
+</div>
+
+<button class="fab" id="btn-export">⤓ 保存长图</button>
+<div class="watermark">本量表仅供娱乐参考</div>
+
+<div class="export-layer" id="export-layer">
+  <img id="export-img" alt="报告长图">
+  <div class="export-tip">长按图片可保存到相册（iOS / 微信内需用此方式）</div>
+  <div class="export-bar">
+    <a id="export-dl" download="情感漠视报告.png">下载图片</a>
+    <button id="export-close" type="button">关闭</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     五个维度 = 情绪在亲密关系里的五层表现
+     ========================================================= */
+  var DIMS = [
+    {
+      name:"情绪识别", short:"识别",
+      note:{
+        lo:"你能给自己的感受命名，也知道它是从哪来的。这让伴侣比较容易接住你。",
+        mid:"多数时候你知道自己不舒服，但说不出到底是不满、失望还是累。",
+        hi:"你常常只能说出「没事」「有点烦」，再往下就卡住了；感受更多以身体不适的形式出现。"
+      }
+    },
+    {
+      name:"情绪表达", short:"表达",
+      note:{
+        lo:"你愿意让伴侣看见你的情绪，包括脆弱的那部分。",
+        mid:"你只在足够安全的时候表达，这本身不是问题，只是需要对方有耐心。",
+        hi:"你的情绪很难被伴侣读到，容易被理解成「不在乎」「不爱了」。"
+      }
+    },
+    {
+      name:"共情", short:"共情",
+      note:{
+        lo:"你能敏锐地接收到伴侣的情绪信号，甚至比他本人还早。",
+        mid:"明显的情绪你能接住，细微的部分容易漏掉。",
+        hi:"你常常需要对方把感受直接说出来，否则容易错过——但这不等于冷漠。"
+      }
+    },
+    {
+      name:"关系", short:"关系",
+      note:{
+        lo:"亲密对你来说是安全的，靠近不会让你想逃。",
+        mid:"你需要多一点空间和缓冲，这属于正常的个体差异。",
+        hi:"靠近、深谈、亲密时刻都会让你不适，你习惯用「做事」代替「在场」。"
+      }
+    },
+    {
+      name:"内在体验", short:"体验",
+      note:{
+        lo:"你有稳定的内在参与感，关系对你是「在里面」的。",
+        mid:"偶尔会有空心感或在关系里抽离，通常出现在压力大的时期。",
+        hi:"空虚感或「隔着玻璃」的体验是持续的——这一项值得被认真对待。"
+      }
+    }
+  ];
+
+  /* =========================================================
+     七种关系原型 = 六条成因路径 + 未检出
+     ========================================================= */
+  var TYPES = {
+    A:{
+      name:"童年情感忽视型", path:"发育与创伤路径",
+      tagline:"你不是不爱，是没人教过你，爱是要说出口的。",
+      verdict:"你在关系里的「冷」，不是不在乎，而是一套从小练出来的自我保护：只要不期待，就不会失望。",
+      cause:"童年情感忽视（CEN）——不是被打被骂，而是「该有回应的时候没有回应」。你说难过，得到「这有什么好哭的」；你说开心，得到「别骄傲」。久而久之，大脑学会一件事：有情绪是危险的、没用的，于是通道关闭。研究显示，述情障碍常常正是「童年创伤 → 成年亲密关系困难」之间的那个中介变量。",
+      manifest:"从很小就是这样，对所有人一致，不只是对伴侣。你往往很痛苦——「我知道我该爱他，但我感觉不到」，这种自我不协调，恰恰是最强的求助信号。",
+      advice:"述情障碍不是绝症，是可以训练的。心理化治疗（MBT）、情绪命名练习、正念身体扫描都有实证支持。这类问题通常不需要吃药，但需要一段足够安全的关系，让你重新学习「说出来也不会死」。",
+      stance:"付出者 · 撤退者",
+      loop:[
+        "伴侣想靠近，想聊一点深的、软的",
+        "你感到陌生甚至危险，用讲道理、做事、开玩笑挡回去",
+        "对方觉得被拒绝，开始追问，或者干脆退开",
+        "你确认了「果然说了也没用」，把门关得更紧"
+      ],
+      mirrors:[
+        {name:"苏明玉", work:"《都挺好》",
+         like:"从小被忽视，很早就学会「不指望别人」；把情绪收起来，用能力和付出来换取位置；一被真正靠近就竖起刺。",
+         unlike:"她最后遇到了愿意反复敲门的人，也确实打开了；而且她比你更愤怒，你更多是「没感觉」。"},
+        {name:"斯内普", work:"《哈利·波特》",
+         like:"把所有的在乎都藏在刻薄和沉默后面，宁可被误解一辈子也不解释。",
+         unlike:"他的爱是炽烈的、明确的；你的问题恰恰是「炽烈不起来」。"}
+      ],
+      strengths:[
+        "极强的独立性：你能一个人把生活撑起来，不会因为没人陪就塌掉。",
+        "对承诺极其认真：不轻易给，给了就真的扛住。",
+        "危机时刻比谁都稳：别人慌的时候，你是那个能做事的人。"
+      ],
+      risks:[
+        {t:"对方开始「情感索取」时", d:"纪念日、生病、崩溃痛哭——这些时刻最需要你回应，也最让你想逃。"},
+        {t:"关系进入必须谈感受的节点", d:"要不要结婚、要不要孩子、要不要为对方搬家。这些决定没法只靠讲道理。"},
+        {t:"你累到极限又没人可依靠时", d:"通道关闭的人不会慢慢没电，而是一次性崩掉。"
+        }
+      ],
+      actions:[
+        "每天睡前写一句「今天我最强烈的一个感觉是____」，只写给自己看。",
+        "每周主动说一次「我今天有点____」，不解释原因，也不许自己收回。",
+        "伴侣说感受时，先回一句「我在听」，至少等十秒再给建议。",
+        "如果条件允许，找一位咨询师做 8–12 次的心理化训练。"
+      ]
+    },
+    B:{
+      name:"神经特质型", path:"神经生物学路径",
+      tagline:"你的情绪系统接线方式不同，不是坏掉了。",
+      verdict:"你不是读不懂爱，是读不懂暗示。给你明确的话，你比谁都认真。",
+      cause:"述情障碍与岛叶（内感受）、前扣带回、杏仁核—前额叶回路的功能连接有关；双生子研究提示存在中等程度的遗传贡献。它是一种跨诊断的人格特质，约 10% 的人如此，在孤独症谱系中高达约一半。",
+      manifest:"从有记忆起就是这样，跨越所有场景。常伴随感官敏感、社交解码困难、对某个领域的过度专注；多数时候「不觉得是问题」，往往是别人的反应让你开始怀疑自己。",
+      advice:"目标不是把自己改造成「情感丰富的人」，而是建一套翻译系统：明确告诉对方「我需要你直接说」，用文字代替表情，用规则代替直觉。如果同时存在社交解码困难、感官敏感，值得做一次成人 ASD 评估。",
+      stance:"翻译者",
+      loop:[
+        "伴侣发出模糊信号：叹气、沉默、一句「随便」",
+        "你按字面理解，没接住",
+        "对方失望：「你根本不在乎我」",
+        "你既困惑又委屈，开始回避这类场景"
+      ],
+      mirrors:[
+        {name:"谢尔顿", work:"《生活大爆炸》",
+         like:"需要明确的规则和说法，读不懂暗示，用逻辑处理一切情感场景；对认定的人极其忠诚。",
+         unlike:"他有艾米和一群朋友长期「翻译」他，而且他从不觉得自己需要道歉；你多半已经学会了自我怀疑。"},
+        {name:"福尔摩斯", work:"《神探夏洛克》",
+         like:"高度理性，对某个领域极度专注，对社交礼仪天然无感。",
+         unlike:"他把冷漠当成优越感；你是想靠近的，只是找不到接口。"}
+      ],
+      strengths:[
+        "极稳定、可预测：和你在一起的人不用猜你今天什么心情。",
+        "不玩心机：你说的就是字面意思，这在亲密关系里非常珍贵。",
+        "对认定的人极其忠诚：一旦划进「自己人」，你会长期地、稳定地在。"
+      ],
+      risks:[
+        {t:"对方情绪低落却不直说时", d:"你会真的以为没事，等爆发时才知道已经晚了。"},
+        {t:"需要「察言观色」的场合", d:"见家长、葬礼、伴侣的同事聚会——你会很累，也容易说错话。"},
+        {t:"长期被说「情商低」之后", d:"你可能会开始自我暗示「我不适合亲密关系」，然后真的退出去。"}
+      ],
+      actions:[
+        "和伴侣定一条规则：「你需要什么，直接说；我读不懂，但我会做。」",
+        "准备三句万能回应：「我在」「你需要我做什么」「我现在没听懂，你再说一遍」。",
+        "把「我读不懂，你告诉我」变成口头禅，而不是道歉词。",
+        "如果社交耗竭明显，试试提前离场，而不是硬撑到崩溃。"
+      ]
+    },
+    C:{
+      name:"症状伴随型", path:"疾病 / 症状路径",
+      tagline:"你不是变心了，是生病了。这两件事必须分开看。",
+      verdict:"你的「没感觉」有起点、有伴随症状——它更像一个需要被治疗的状态，而不是你的人格。",
+      cause:"抑郁发作（快感缺失 + 精神运动性迟滞）、精神分裂症的阴性症状、PTSD 的解离性麻木、BPD 的慢性空虚、物质使用，都会表现为「感觉不到」。其中抑郁的麻木和精分的阴性症状最容易混：前者是「充满痛苦但表达不出来」，后者是「真的没有情绪波动」。",
+      manifest:"近期出现或明显加重；常伴随失眠/嗜睡、兴趣丧失、自责自罪，或思维与行为的异常；和「从小如此」不同，你能清楚回忆起「以前我不是这样的」。",
+      advice:"先看精神科，不要把它当性格问题去自责。抑郁导致的麻木在治疗好转后通常会恢复；精分的阴性症状需要的是调整抗精神病治疗方案，而不是「多表达、多社交」。",
+      stance:"旁观者",
+      loop:[
+        "你的状态开始下滑，慢慢关机",
+        "伴侣以为你在生气、在冷暴力、不爱了",
+        "你解释不清，干脆沉默",
+        "对方受伤离开，你更加确信「我不值得被爱」"
+      ],
+      mirrors:[
+        {name:"我爱罗", work:"《火影忍者》",
+         like:"不是不想感受，是长期只感受到痛，其他一切都麻木了；用「只爱自己」保护自己。",
+         unlike:"他的麻木是被尾兽和整个村子的恐惧造成的，而且他遇到了鸣人；你的原因可能普通得多——一段抑郁、一次创伤、长期失眠。"}
+      ],
+      strengths:[
+        "忍耐力惊人：你扛过的东西，很多人一天都撑不住。",
+        "对痛苦的高耐受：这让你在别人崩溃时反而很稳。",
+        "恢复之后往往更珍惜：从低谷里爬出来的人，对关系的理解会比别人深。"
+      ],
+      risks:[
+        {t:"症状加重却没被识别", d:"最容易被误判成「变心」「冷暴力」，然后关系先崩，病还没治。"},
+        {t:"伴侣长期承受「跟一个空壳生活」", d:"照护者也会耗竭，这不是谁的错，但需要被看见。"},
+        {t:"自责升级", d:"「我拖累了他」这种念头，是抑郁最危险的自我攻击方式。"
+        }
+      ],
+      actions:[
+        "先看精神科，而不是先谈感情——顺序反了，两边都会更糟。",
+        "做一次完整评估：睡眠、食欲、病程、有没有过自伤念头。",
+        "明确告诉伴侣：「我最近状态不好，不是你的问题，我在处理。」",
+        "把「我没事」换成「我现在说不出，但我在」。"
+      ]
+    },
+    D:{
+      name:"药物相关型", path:"药物与医源性路径",
+      tagline:"这可能是药带来的，不是你的问题，也不该你一个人扛。",
+      verdict:"你的情感变淡有明确的时间起点——这更像是药物的作用，而不是你变成了另一个人。",
+      cause:"SSRI 等抗抑郁药可能导致「情感钝化」（emotional blunting）：抑郁好转了，但快乐和悲伤都变淡了，像隔着一层玻璃活着。这是患者自行停药的首要原因之一，却常被误判为「抑郁还没好」，于是加量——越加越钝。",
+      manifest:"在开始服用某类药物之后出现或明显加重；好坏都变淡，不只是负面情绪消失；常伴随「我不像我自己了」的失真感；有人形容为「知道应该难过，但身体不配合」。",
+      advice:"记录出现时间与剂量的关系，尽快找原开药医生复诊，讨论减量、换药或调整方案——这是有明确处理路径的。⚠️ 不要自行停药：撤药反应（头晕、电击感、情绪反跳）可能比钝化本身更难受。",
+      stance:"被调低了音量的人",
+      loop:[
+        "用药之后，情绪变平，好坏都不太有波澜",
+        "伴侣觉得你「变了一个人」",
+        "你自己也怀疑：是不是我不爱他了",
+        "自责、想停药，然后撤药反应把你打回更糟的状态"
+      ],
+      mirrors:[
+        {name:"维德", work:"《三体》",
+         like:"不是没有感情，而是把感情当成可以卸下的零件；为了目标，可以把「感受」这一项关掉。",
+         unlike:"他是主动选择的，而且因此更强；你是被动接受的，而且因此更空。这一点差别很关键。"}
+      ],
+      strengths:[
+        "你曾经能感受——这说明通道还在，只是被压住了。",
+        "你对药物反应敏感，这反而是好事：说明可调。",
+        "你愿意为这段关系找答案，这本身就是在乎的证据。"
+      ],
+      risks:[
+        {t:"自行停药", d:"撤药反应可能比钝化更难熬，而且情绪反跳会伤到关系。"},
+        {t:"把钝化误判为「感情淡了」", d:"很多人是在这一步分的手，其实换个药就好了。"},
+        {t:"医生不知道", d:"如果你不说「我情感变钝了」，复诊时只会被当成「还没好」而加量。"
+        }
+      ],
+      actions:[
+        "记录一条时间线：什么时候开始吃、什么时候开始钝、剂量变过几次。",
+        "尽快复诊，原话就说「我情感变钝了，影响关系」，不要只说「还好」。",
+        "如果伴侣愿意，带他一起去一次，让他听到医生怎么解释。",
+        "在医生指导下调整，不要自己减量或隔天吃。"
+      ]
+    },
+    E:{
+      name:"关系耗竭型", path:"关系情境路径",
+      tagline:"你不是天生冷漠，是在某段关系里被耗干了。",
+      verdict:"你的关闭是有对象的——对朋友正常，只在最亲的人面前关机。这不是人格问题，是这段关系把你耗到了只能撤退。",
+      cause:"反复表达需求被无视之后的「习得性无助」；长期处在冷暴力中；照护病人、育儿、高压工作之后的情绪耗竭。人不是关掉了情感，是关掉了「表达」这个高风险动作——因为每一次表达都换来一次失望。",
+      manifest:"只在亲密关系里出现，对朋友、同事却很正常；有明确的时间起点；常伴随「我懒得说了」「说了也没用」；离开那段关系后往往会明显恢复。",
+      advice:"先分清三件事：冷暴力（对方有能力回应，却故意不给，目的是惩罚或控制）、冷处理（为了降温而暂停，会告知、会回来）、情感漠视（通道被堵住，想给也给不出）。如果是关系造成的，设边界、伴侣咨询，或者离开消耗源，往往比「治疗自己」有效得多。",
+      stance:"撤退者",
+      loop:[
+        "你表达了一次需求，被无视或被嘲笑",
+        "你减少表达，只做「该做的事」",
+        "对方觉得你变了、冷了，开始抱怨",
+        "你确认「说了也没用」，彻底关门"
+      ],
+      mirrors:[
+        {name:"沈眉庄", work:"《甄嬛传》",
+         like:"被最信任的人伤透之后彻底关门，从此只做「该做的事」，不再期待、不再解释。",
+         unlike:"她是被权力和背叛压垮的，而且后来遇到了温实初；你的耗竭可能只是某段关系里长期说不上话——更轻，也更好修。"}
+      ],
+      strengths:[
+        "极强的自我修复力：离开消耗源之后，你恢复得比谁都快。",
+        "对关系有清醒的判断：你知道什么时候该走。",
+        "你不是不会爱，你只是把爱用完了——这说明你曾经给得很多。"
+      ],
+      risks:[
+        {t:"把「耗竭」误认为「我天生冷漠」", d:"一旦这么定义自己，就会放弃修复，甚至放弃下一段关系。"},
+        {t:"长期留在消耗关系里", d:"每多待一年，恢复需要的時間就更长。"},
+        {t:"带着旧账进入下一段", d:"新的人什么都没做，却要替你上一个对手还债。"
+        }
+      ],
+      actions:[
+        "先做一个判断：对方是「不能」回应，还是「不愿」回应。这两件事的处理方式完全相反。",
+        "给自己设一个期限：「我再认真试三个月」，而不是无限期忍耐。",
+        "如果对方没有改变意愿，考虑离开，而不是把自己改造得更能忍。",
+        "在恢复期，先找回「我想要什么」，再谈下一段关系。"
+      ]
+    },
+    F:{
+      name:"文化压抑型", path:"文化与性别规训路径",
+      tagline:"你不是没有情绪，是从小被训练成「不许有情绪」。",
+      verdict:"你的得体是被训练出来的。你把「不麻烦别人」当成最高美德，代价是没人真正认识你。",
+      cause:"「懂事」教育、「男儿有泪不轻弹」、「喜怒不形于色」、家里只谈成绩和钱。在东亚语境里，情绪表达常被视为「给人添麻烦」。压久了，不是学会了控制，而是真的感觉不到了——压抑一旦自动化，就变成了人格。",
+      manifest:"习惯用行动代替语言：做事、给钱、解决问题，但说不出「我心疼你」；把情绪等同于软弱或不成熟；表达之前会先自我审查「这值不值得说」。",
+      advice:"这不是病，是习得，所以可以重新学。从最小的一步开始：每天用一个具体的词描述一次感受，不必分享给任何人。然后找一个「说了也不会被评价」的人，允许自己在对方面前不合格一次。",
+      stance:"得体者",
+      loop:[
+        "你有了情绪",
+        "你自动审查：「这值不值得说」「说了会不会难看」",
+        "你选择不说，转而把事做得更周到",
+        "对方觉得你疏离，你觉得对方矫情"
+      ],
+      mirrors:[
+        {name:"薛宝钗", work:"《红楼梦》",
+         like:"「罕言寡语，人谓装愚；安分随时，自云守拙」；用周全和理性处理一切情感场景，情绪永远得体。",
+         unlike:"她是主动选择「稳」，而且从不觉得委屈；你是被训练成这样的，心里其实有火。"}
+      ],
+      strengths:[
+        "极其可靠、体面：把事情交给你，没人会担心出错。",
+        "危机中不添乱：你是那种「先解决问题，再谈感受」的人。",
+        "共情能力其实很强：你只是不往外拿，不是没有。"
+      ],
+      risks:[
+        {t:"长期压抑的躯体化", d:"胃、失眠、甲状腺、偏头痛——情绪不会消失，它换一种方式出现。"},
+        {t:"在亲密关系里被误解为「不爱」", d:"你做了十件事，抵不过一句「你从来没说过爱我」。"},
+        {t:"某天突然崩掉", d:"所有人都震惊：「他怎么会？」——因为没人见过你示弱。"
+        }
+      ],
+      actions:[
+        "每天用一个具体的词描述一次感受，只写给自己看。",
+        "找一个「说了也不会被评价」的人，先练习说三句真话。",
+        "允许自己在伴侣面前「不合格」一次：不收拾、不周到、不体面。",
+        "把「我没事」换成「我现在还不想说，但不是因为你」。"
+      ]
+    },
+    G:{
+      name:"未检出明显情感漠视", path:"低倾向 / 无明确路径",
+      tagline:"就这份量表而言，你的情绪通道是通的。",
+      verdict:"你能感受到，也能说出来——这在亲密关系里，是最被低估的能力。",
+      cause:"你的作答没有显示出明显的情绪识别、表达、共情或关系层面的困难，也没有指向创伤、药物、疾病或文化压抑中的任何一条路径。",
+      manifest:"五个维度普遍偏低，且高分选项很少被选中。这说明你目前的情绪通道是通畅的。",
+      advice:"但请记得两件事：第一，量表是筛查不是诊断，低分不等于没问题——自我报告很容易受防御机制影响，有些人恰恰是「太习惯压抑」，所以答不出真实的自己。第二，如果你在现实里反复被伴侣说「冷漠」「不在乎人」，那个落差本身值得认真对待。",
+      stance:"在场者",
+      loop:[
+        "你有情绪",
+        "你说出来，或者让对方看见",
+        "对方接住了，也可能没接住",
+        "关系在一次次「说—接住」里变厚"
+      ],
+      mirrors:[
+        {name:"成德善", work:"《请回答1988》",
+         like:"情绪是流动的，会闹、会笑、会哭，也会在关键时刻护住家人；不擅长掩饰，也不觉得需要掩饰。",
+         unlike:"她比你外放得多；你可能只是「正常范围内偏安静」，这同样很好。"}
+      ],
+      strengths:[
+        "你能让伴侣感到「被看见」，这是稀缺能力。",
+        "你的情绪是流动的，不容易积压成躯体症状。",
+        "你在关系里有弹性：能靠近，也能独处。"
+      ],
+      risks:[
+        {t:"把「健康」当成理所当然", d:"长期高压、生育、照护，都可能把通道关掉。"},
+        {t:"低估对方的耗竭", d:"你表达得多，对方可能一直在接，也会累。"},
+        {t:"被「自我诊断」带偏", d:"刷多了短视频，容易把正常波动当成病。"
+        }
+      ],
+      actions:[
+        "留意自己的低谷期：连续两周提不起劲，就该认真对待。",
+        "也问问伴侣：「我有没有让你觉得累？」",
+        "别用网上的清单诊断自己，也别用它诊断伴侣。",
+        "如果身边有人说你「冷」，先别急着否认，问一句「你具体指哪件事」。"
+      ]
+    }
+  };
+
+  /* =========================================================
+     20 道题 · 每维 4 题 · 全部围绕亲密关系
+     ========================================================= */
+  var QUESTIONS = [
+    /* ---------- 维度 1：情绪识别 ---------- */
+    {dim:0, q:"伴侣问你「你今天怎么了，是不是不开心」，你通常——",
+     o:[
+       {t:"能说清楚自己怎么了，甚至能讲出是因为哪件事", s:0, w:{}},
+       {t:"大概知道是好是坏，但说不出具体是什么", s:1, w:{}},
+       {t:"只能说「没事」「有点烦」，再往下就卡住了", s:2, w:{}},
+       {t:"我要先想想身体哪里不舒服，才猜得到自己怎么了", s:3, w:{}}
+     ]},
+    {dim:0, q:"在关系里，你能分清「委屈」「生气」「失望」「累」吗？",
+     o:[
+       {t:"分得很清楚，它们完全不一样", s:0, w:{}},
+       {t:"大部分时候能分清", s:1, w:{}},
+       {t:"经常混在一起，说不准到底是哪一种", s:2, w:{}},
+       {t:"对我来说它们都只是一种「不舒服」", s:3, w:{}}
+     ]},
+    {dim:0, q:"和伴侣相处时情绪不好，你最先注意到的是——",
+     o:[
+       {t:"情绪本身。我知道自己在难过，或者生气", s:0, w:{}},
+       {t:"情绪，偶尔也会注意到身体的变化", s:1, w:{}},
+       {t:"身体先不对劲，过一阵才反应过来可能是情绪", s:2, w:{}},
+       {t:"只有身体：胃痛、胸闷、头痛、莫名其妙很累", s:3, w:{}}
+     ]},
+    {dim:0, q:"伴侣做了让你感动的事（记得你的喜好、突然出现），你——",
+     o:[
+       {t:"明显被触动，会开心，会想抱他", s:0, w:{}},
+       {t:"有点开心，但不会表现太多", s:1, w:{}},
+       {t:"知道「应该感动」，但心里没什么波动", s:2, w:{B:1}},
+       {t:"常常是事后才反应过来「我当时应该很开心」", s:3, w:{B:1}}
+     ]},
+
+    /* ---------- 维度 2：情绪表达 ---------- */
+    {dim:1, q:"你难过的时候，会让伴侣知道吗？",
+     o:[
+       {t:"会主动说，我需要他", s:0, w:{}},
+       {t:"对伴侣会说，对别人不会", s:1, w:{}},
+       {t:"很难开口，宁可自己消化", s:2, w:{F:2,A:1}},
+       {t:"绝不会。说了没用，甚至会被嫌烦", s:3, w:{A:3,F:1}}
+     ]},
+    {dim:1, q:"伴侣能从你的表情看出你的心情吗？",
+     o:[
+       {t:"很容易看出来，我藏不住", s:0, w:{}},
+       {t:"熟悉我的人能看出来", s:1, w:{}},
+       {t:"经常被说「面瘫」「猜不透你在想什么」", s:2, w:{B:2}},
+       {t:"他总说「我完全不知道你在想什么」", s:3, w:{B:3}}
+     ]},
+    {dim:1, q:"伴侣问你「你爱我吗」，你的反应是——",
+     o:[
+       {t:"能自然地说出来，还会补充理由", s:0, w:{}},
+       {t:"说得出口，但有点别扭", s:1, w:{}},
+       {t:"说不出口，改用行动表示：买东西、做事、安排生活", s:2, w:{F:3}},
+       {t:"会很烦躁，觉得「这有什么好问的」", s:3, w:{A:2,F:1}}
+     ]},
+    {dim:1, q:"在伴侣面前，你哭过吗？",
+     o:[
+       {t:"哭过，而且不怕被看到", s:0, w:{}},
+       {t:"很少，但有过", s:1, w:{}},
+       {t:"从来没有。我会等到一个人的时候再哭", s:2, w:{A:2}},
+       {t:"我好像已经很久没有哭过了", s:3, w:{A:3}}
+     ]},
+
+    /* ---------- 维度 3：共情 ---------- */
+    {dim:2, q:"伴侣跟你抱怨工作或朋友，你的第一反应是——",
+     o:[
+       {t:"先接住他的情绪，陪他待一会儿", s:0, w:{}},
+       {t:"先安慰，再一起想办法", s:1, w:{}},
+       {t:"直接分析原因、给建议，把问题解决掉", s:2, w:{F:1}},
+       {t:"有点不耐烦，或者完全不知道该说什么", s:3, w:{A:1}}
+     ]},
+    {dim:2, q:"伴侣说「我没事」的时候，你——",
+     o:[
+       {t:"基本能听出他其实有事", s:0, w:{}},
+       {t:"有时候能察觉到不对", s:1, w:{}},
+       {t:"通常就当真了，事后才发现不是", s:2, w:{B:2}},
+       {t:"我一直都是当真的，被说过很多次「你读不懂空气」", s:3, w:{B:3}}
+     ]},
+    {dim:2, q:"你能察觉到伴侣情绪的变化吗——哪怕他什么都没说？",
+     o:[
+       {t:"基本都能，甚至比他本人还早", s:0, w:{}},
+       {t:"明显的时候可以", s:1, w:{}},
+       {t:"经常后知后觉，等他说出来才反应过来", s:2, w:{B:2}},
+       {t:"几乎察觉不到，我需要他直接告诉我", s:3, w:{B:3}}
+     ]},
+    {dim:2, q:"伴侣指责你「你根本不在乎我」，你会——",
+     o:[
+       {t:"没被这样说过", s:0, w:{}},
+       {t:"偶尔被说，我能理解他为什么这么想", s:1, w:{}},
+       {t:"被说过几次，我很困惑，不知道自己哪里做错了", s:2, w:{A:2,B:1}},
+       {t:"经常被说，我很委屈——我明明是在乎的", s:3, w:{A:3,B:1}}
+     ]},
+
+    /* ---------- 维度 4：关系（最核心的相处层） ---------- */
+    {dim:3, q:"关系进入「谈感受」的阶段（谈未来、谈脆弱、谈童年），你会——",
+     o:[
+       {t:"愿意深入聊，这让我觉得更近", s:0, w:{}},
+       {t:"能聊，但需要一点时间准备", s:1, w:{}},
+       {t:"会转移话题、找借口，或者突然想一个人待着", s:2, w:{E:3}},
+       {t:"强烈不适，宁可结束这段关系", s:3, w:{E:3,A:1}}
+     ]},
+    {dim:3, q:"亲密时刻之后（拥抱、依偎、性之后），你更想——",
+     o:[
+       {t:"继续贴着，聊会儿天", s:0, w:{}},
+       {t:"抱一会儿，然后各自做事", s:1, w:{}},
+       {t:"想快点起身，去做点别的", s:2, w:{E:3}},
+       {t:"会突然觉得很空，或者很想一个人待着", s:3, w:{E:3,A:1}}
+     ]},
+    {dim:3, q:"吵架之后，你通常会——",
+     o:[
+       {t:"主动去沟通，把话说开", s:0, w:{}},
+       {t:"冷静一下，然后再谈", s:1, w:{}},
+       {t:"等对方先低头，或者假装什么都没发生", s:2, w:{E:3}},
+       {t:"好几天不想说话，也说不出口", s:3, w:{E:2,A:1}}
+     ]},
+    {dim:3, q:"你更习惯用哪种方式对伴侣好？",
+     o:[
+       {t:"陪伴、倾听、说心里话", s:0, w:{}},
+       {t:"两者都有，看情况", s:1, w:{}},
+       {t:"做事：修东西、接送、给钱、把生活安排好", s:2, w:{F:2}},
+       {t:"我不知道怎么对他好，常被说「你根本不在乎我」", s:3, w:{A:2}}
+     ]},
+
+    /* ---------- 维度 5：内在体验 ---------- */
+    {dim:4, q:"在一段关系里，你会有「空虚感」吗——不是无聊，是里面什么都没有？",
+     o:[
+       {t:"很少有", s:0, w:{}},
+       {t:"偶尔，通常在很累的时候", s:1, w:{}},
+       {t:"经常有", s:2, w:{A:2}},
+       {t:"一直都有，像空心的一样", s:3, w:{A:2,C:2}}
+     ]},
+    {dim:4, q:"你有没有「隔着玻璃」的感觉——明明在身边，却像隔着一层？",
+     o:[
+       {t:"没有，我很有参与感", s:0, w:{}},
+       {t:"偶尔，压力大的时候", s:1, w:{}},
+       {t:"有过，某次重大打击之后就一直是这样", s:2, w:{C:3}},
+       {t:"有，而且是在开始服用某些药物之后才明显的", s:3, w:{D:5}}
+     ]},
+    {dim:4, q:"对「感觉不到」这件事本身，你的态度是——",
+     o:[
+       {t:"我没有这个问题", s:0, w:{}},
+       {t:"有点困扰，但不太影响生活", s:1, w:{}},
+       {t:"很痛苦。我很想感觉到，但做不到", s:2, w:{A:2}},
+       {t:"不觉得是问题，反而是对方太情绪化了", s:3, w:{B:2,F:2}}
+     ]},
+    {dim:4, q:"如果「感觉不到」是一种状态，它大概从什么时候开始？",
+     o:[
+       {t:"我没有这种状态", s:0, w:{}},
+       {t:"从小就是这样，我一直是那个「懂事、冷静」的人", s:2, w:{A:3,F:1}},
+       {t:"某段关系或某次经历之后才变成这样", s:2, w:{E:4}},
+       {t:"最近开始的，同时伴随情绪低落、失眠、提不起兴趣", s:2, w:{C:4}}
+     ]}
+  ];
+
+  /* =========================================================
+     状态
+     ========================================================= */
+  var answers = new Array(QUESTIONS.length).fill(-1);
+  var idx = 0;
+  var locked = false;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var screenCover = $("screen-cover"), screenQuiz = $("screen-quiz"), screenResult = $("screen-result");
+  var fab = $("btn-export");
+
+  function show(el){
+    [screenCover, screenQuiz, screenResult].forEach(function(s){ s.classList.remove("active"); });
+    el.classList.add("active");
+    fab.classList.toggle("show", el === screenResult);
+    window.scrollTo(0, 0);
+  }
+
+  function toast(msg){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function(){ t.classList.remove("show"); }, 2600);
+  }
+
+  /* =========================================================
+     答题
+     ========================================================= */
+  function render(){
+    var q = QUESTIONS[idx];
+    locked = false;
+    $("cur").textContent = idx + 1;
+    $("bar").style.width = (idx / QUESTIONS.length * 100) + "%";
+    $("qnum").textContent = "QUESTION " + String(idx + 1).padStart(2, "0");
+    $("qtext").textContent = q.q;
+    $("btn-back").hidden = (idx === 0);
+
+    var box = $("options");
+    box.innerHTML = "";
+    var keys = ["A","B","C","D"];
+
+    q.o.forEach(function(opt, i){
+      var btn = document.createElement("button");
+      btn.className = "option";
+      btn.type = "button";
+      if (answers[idx] === i) btn.classList.add("picked");
+      var k = document.createElement("span");
+      k.className = "key";
+      k.textContent = keys[i];
+      var t = document.createElement("span");
+      t.className = "txt";
+      t.textContent = opt.t;
+      btn.appendChild(k);
+      btn.appendChild(t);
+      btn.addEventListener("click", function(){ choose(i); });
+      box.appendChild(btn);
+    });
+  }
+
+  function choose(i){
+    if (locked) return;
+    locked = true;
+    answers[idx] = i;
+    var btns = $("options").querySelectorAll(".option");
+    for (var b = 0; b < btns.length; b++){
+      if (b === i) btns[b].classList.add("picked");
+      else btns[b].classList.add("dim");
+    }
+    $("bar").style.width = ((idx + 1) / QUESTIONS.length * 100) + "%";
+    setTimeout(function(){
+      if (idx < QUESTIONS.length - 1){ idx++; render(); }
+      else { finish(); }
+    }, 280);
+  }
+
+  function back(){ if (idx === 0) return; idx--; render(); }
+
+  /* =========================================================
+     计分
+     ========================================================= */
+  function compute(){
+    var dimRaw = [0,0,0,0,0];
+    var total = 0;
+    var pathRaw = { A:0, B:0, C:0, D:0, E:0, F:0 };
+
+    QUESTIONS.forEach(function(q, qi){
+      var a = answers[qi];
+      if (a < 0) return;
+      var opt = q.o[a];
+      dimRaw[q.dim] += opt.s;
+      total += opt.s;
+      for (var k in opt.w){
+        if (Object.prototype.hasOwnProperty.call(opt.w, k)) pathRaw[k] += opt.w[k];
+      }
+    });
+
+    var pathMax = { A:0, B:0, C:0, D:0, E:0, F:0 };
+    QUESTIONS.forEach(function(q){
+      ["A","B","C","D","E","F"].forEach(function(k){
+        var m = 0;
+        q.o.forEach(function(o){ if (o.w[k] && o.w[k] > m) m = o.w[k]; });
+        pathMax[k] += m;
+      });
+    });
+
+    var pathRatio = {};
+    ["A","B","C","D","E","F"].forEach(function(k){
+      pathRatio[k] = pathMax[k] > 0 ? pathRaw[k] / pathMax[k] : 0;
+    });
+
+    var dimPct = dimRaw.map(function(v){ return Math.round(v / 12 * 100); });
+    var severity = Math.round(total / 60 * 100);
+
+    var key, best = "A";
+    ["A","B","C","E","F"].forEach(function(k){
+      if (pathRatio[k] > pathRatio[best]) best = k;
+    });
+
+    if (pathRaw.D >= 5 && total >= 3) key = "D";
+    else if (total < 12) key = "G";
+    else if (pathRatio[best] >= 0.30) key = best;
+    else if (total >= 45) key = best;
+    else key = "G";
+
+    return { key:key, dimPct:dimPct, total:total, severity:severity, pathRatio:pathRatio, pathRaw:pathRaw };
+  }
+
+  function bandOf(p){ return p >= 65 ? "hi" : (p >= 35 ? "mid" : "lo"); }
+
+  function sevLabel(s){
+    if (s >= 70) return "重度";
+    if (s >= 40) return "中度";
+    return "轻度";
+  }
+  var LEVEL_NOTE = {
+    "轻度":"轻度范围：更像是某些情境下的反应，还没有固化成固定模式——这也是改变成本最低的时候。",
+    "中度":"中度范围：它已经稳定出现在不止一段关系里，开始明显拉低你们的沟通质量，值得认真处理。",
+    "重度":"重度范围：它已经明显影响你的亲密关系和生活质量。这时候优先考虑专业帮助，比靠自己硬扛更有效。"
+  };
+
+  function stanceOf(d){
+    var rel = d[3], exp = d[1];
+    if (rel >= 60) return {t:"撤退型", d:"一靠近就想退。你不是不需要人，是需要一个不会追问你的人。"};
+    if (rel <= 35 && exp >= 55) return {t:"靠近型", d:"你愿意说，也敢要。这在亲密关系里是稀缺能力。"};
+    if (rel <= 35 && exp < 55) return {t:"沉默的靠近者", d:"你想靠近，但话到嘴边就变成了「没事」。"};
+    return {t:"摇摆型", d:"一半想靠近，一半想逃。你的关系常常停在「差一点」。"};
+  }
+
+  /* =========================================================
+     报告
+     ========================================================= */
+  function finish(){
+    $("bar").style.width = "100%";
+    var r = compute();
+    var t = TYPES[r.key];
+    var stance = stanceOf(r.dimPct);
+
+    var match;
+    if (r.key === "G"){ match = 100 - r.severity; if (match < 40) match = 40; }
+    else { match = Math.round(r.pathRatio[r.key] * 100); if (match < 10) match = 10; }
+
+    var order = [0,1,2,3,4].slice().sort(function(a,b){ return r.dimPct[b] - r.dimPct[a]; });
+    var top = order.filter(function(i){ return r.dimPct[i] >= 55; });
+    if (top.length === 0) top = order.slice(0, 2);
+    if (top.length > 2) top = top.slice(0, 2);
+    var topNames = top.map(function(i){ return DIMS[i].name; });
+
+    var lvl = sevLabel(r.severity);
+    currentLevel = (r.key === "G" && r.severity < 20) ? "" : lvl;
+    var showLevel = !(r.key === "G" && r.severity < 20);
+    var titleHTML;
+    if (!showLevel){
+      titleHTML = "未检出明显情感漠视";
+    } else if (r.key === "G"){
+      titleHTML = '<span class="sev">' + lvl + '</span><span class="dot-sep">·</span>情感漠视（未分型）';
+    } else {
+      titleHTML = '<span class="sev">' + lvl + '</span><span class="dot-sep">·</span>' + t.name + '情感漠视';
+    }
+
+    var displayTag = t.tagline, verdict = t.verdict;
+    var causeText = t.cause, manifestText = t.manifest;
+    if (r.key === "G" && r.severity >= 20){
+      displayTag = "你的作答没有指向任何一条清晰的路径。";
+      verdict = "你的分数不高也不低，比较平均——这不是某个固定模式，更像一段「说不清哪里不对」的时期。";
+      causeText = "你的作答没有指向任何一条清晰的路径——既没有明显的童年忽视线索，也没有近期的疾病、用药或关系事件作为起点。各项分数比较平均，更像是整体的情绪水位偏低。";
+      manifestText = "五个维度比较平均，没有哪一项特别突出。这说明你的困扰是弥散的，而不是集中在某个特定环节——它更可能和整体状态（压力、疲惫、阶段性的低落）有关。";
+    }
+
+    var dimsHTML = "";
+    DIMS.forEach(function(d, i){
+      dimsHTML += '<div class="dim-row">' +
+        '<div class="dim-name">' + d.name + '</div>' +
+        '<div class="dim-track"><div class="dim-fill" data-w="' + r.dimPct[i] + '"></div></div>' +
+        '<div class="dim-val">' + r.dimPct[i] + '</div></div>';
+    });
+
+    var notesHTML = "";
+    DIMS.forEach(function(d, i){
+      notesHTML += '<div class="dim-note"><b>' + d.name + ' ' + r.dimPct[i] + '｜</b>' +
+        d.note[bandOf(r.dimPct[i])] + '</div>';
+    });
+
+    var loopHTML = "";
+    t.loop.forEach(function(s, i){
+      loopHTML += '<li><span class="dot">' + (i+1) + '</span>' + s + '</li>';
+    });
+
+    var mirrorHTML = "";
+    t.mirrors.forEach(function(m){
+      mirrorHTML += '<div class="mirror">' +
+        '<div class="who"><span class="cname">' + m.name + '</span><span class="cwork">' + m.work + '</span></div>' +
+        '<p class="mline"><b>像在哪：</b>' + m.like + '</p>' +
+        '<p class="mline"><b>不像在哪：</b>' + m.unlike + '</p>' +
+        '</div>';
+    });
+
+    var strengthHTML = t.strengths.map(function(s){ return '<li><i class="li-dot"></i>' + s + '</li>'; }).join("");
+    var riskHTML = t.risks.map(function(x){ return '<li><i class="li-dot warm"></i><span class="rtitle">' + x.t + '</span>：' + x.d + '</li>'; }).join("");
+    var actionHTML = t.actions.map(function(s){ return '<li><i class="li-dot act"></i>' + s + '</li>'; }).join("");
+
+    var combo = (r.key === "G")
+      ? "你的倾向指数为 " + r.severity + " / 100。"
+      : "你的困扰主要集中在「" + topNames.join("」和「") + "」，倾向指数 " + r.severity + " / 100。";
+
+    var html =
+      '<div class="result-head">' +
+        '<div class="badges">' +
+          '<span class="match">匹配度 ' + match + ' %</span>' +
+          '<span class="match lvl">程度 · ' + (showLevel ? lvl : "未检出") + '</span>' +
+        '</div>' +
+        '<h2>' + titleHTML + '</h2>' +
+        '<div class="path">' + t.path + ' · 倾向指数 ' + r.severity + '</div>' +
+        '<p class="tagline">' + displayTag + '</p>' +
+      '</div>' +
+
+      '<div class="verdict"><div class="vlabel">ONE-LINE VERDICT · 一句话结论</div>' +
+        '<div class="vtext">' + verdict + '</div>' +
+        (showLevel ? '<div class="vsub">' + LEVEL_NOTE[lvl] + '</div>' : '') +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>你的五维画像</h3>' +
+        '<div class="radar-wrap"><canvas id="radar"></canvas></div>' +
+        '<div class="dims">' + dimsHTML + '</div>' +
+        '<div class="dim-notes">' + notesHTML + '</div>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>你在关系里的位置</h3>' +
+        '<div class="stance"><span class="stance-badge">' + stance.t + '</span>' +
+        '<p>' + stance.d + '</p></div>' +
+        '<p style="margin-top:12px;">你在这段关系里的角色更像：<b>' + t.stance + '</b>。' + combo + '</p>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>你们的关系循环</h3>' +
+        '<ol class="loop">' + loopHTML + '</ol>' +
+        '<p style="margin-top:14px;font-size:13px;color:#7799b3;">这个循环最残忍的地方在于：你越怕受伤，越会做出让对方受伤的事；而对方的受伤，又反过来证明了你「果然不该打开」。</p>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>这从哪来</h3>' +
+        '<p>' + causeText + '</p>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>你像谁 · 文学与银幕的镜像</h3>' +
+        mirrorHTML +
+        '<p style="margin-top:12px;font-size:12.5px;color:#8aaac1;">* 比喻不是诊断。他们的处境是戏剧化的，你的处境是具体的，别把自己活成一个角色。</p>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>它长什么样</h3>' +
+        '<p>' + manifestText + '</p>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>你可能没注意到的三个优势</h3>' +
+        '<ul class="plain">' + strengthHTML + '</ul>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>三个高风险时刻</h3>' +
+        '<ul class="plain risk">' + riskHTML + '</ul>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>七天行动清单</h3>' +
+        '<ul class="plain action">' + actionHTML + '</ul>' +
+      '</div>' +
+
+      '<div class="panel"><h3><i class="h3bar"></i>如果要做更深的改变</h3>' +
+        '<p>' + t.advice + '</p>' +
+      '</div>' +
+
+      '<div class="report-foot">情感漠视量表 · 亲密关系版　｜　本量表仅供娱乐参考，不构成诊断或医疗建议</div>';
+
+    $("report-root").innerHTML = html;
+    show(screenResult);
+
+    requestAnimationFrame(function(){
+      var fills = document.querySelectorAll(".dim-fill");
+      for (var i = 0; i < fills.length; i++){
+        (function(el){
+          setTimeout(function(){ el.style.width = el.getAttribute("data-w") + "%"; }, 60 + i * 60);
+        })(fills[i]);
+      }
+      setTimeout(function(){ drawRadar(r.dimPct); }, 100);
+    });
+  }
+
+  /* =========================================================
+     雷达图
+     ========================================================= */
+  function drawRadar(values){
+    var cv = document.getElementById("radar");
+    if (!cv) return;
+    var rect = cv.getBoundingClientRect();
+    var w = Math.round(rect.width) || 300;
+    var h = Math.round(rect.height) || w;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    cv.width = w * dpr;
+    cv.height = h * dpr;
+    var ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+
+    var cx = w/2, cy = h/2 + 2, R = Math.min(w,h) * 0.31, n = 5;
+    var ang = function(i){ return -Math.PI/2 + i * (Math.PI*2/n); };
+    var pt = function(i,r){ return [cx + Math.cos(ang(i))*r, cy + Math.sin(ang(i))*r]; };
+
+    for (var ring = 1; ring <= 4; ring++){
+      ctx.beginPath();
+      for (var i = 0; i <= n; i++){
+        var p = pt(i % n, R * ring / 4);
+        if (i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = ring === 4 ? "rgba(120,170,210,.42)" : "rgba(150,190,220,.28)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+    for (var j = 0; j < n; j++){
+      var e = pt(j, R);
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(e[0], e[1]);
+      ctx.strokeStyle = "rgba(150,190,220,.26)"; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    var ratio = values.map(function(v){ return Math.max(0.02, Math.min(1, v/100)); });
+    ctx.beginPath();
+    for (var k = 0; k <= n; k++){
+      var q = pt(k % n, R * ratio[k % n]);
+      if (k === 0) ctx.moveTo(q[0], q[1]); else ctx.lineTo(q[0], q[1]);
+    }
+    ctx.closePath();
+    var grad = ctx.createLinearGradient(cx-R, cy-R, cx+R, cy+R);
+    grad.addColorStop(0, "rgba(140,200,240,.55)");
+    grad.addColorStop(1, "rgba(70,140,205,.35)");
+    ctx.fillStyle = grad; ctx.fill();
+    ctx.strokeStyle = "rgba(74,144,217,.85)"; ctx.lineWidth = 2; ctx.lineJoin = "round"; ctx.stroke();
+
+    for (var d = 0; d < n; d++){
+      var pp = pt(d, R * ratio[d]);
+      ctx.beginPath(); ctx.arc(pp[0], pp[1], 5.6, 0, Math.PI*2); ctx.fillStyle = "rgba(74,144,217,.16)"; ctx.fill();
+      ctx.beginPath(); ctx.arc(pp[0], pp[1], 3.2, 0, Math.PI*2); ctx.fillStyle = "#4a90d9"; ctx.fill();
+    }
+
+    ctx.font = '500 12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    for (var m = 0; m < n; m++){
+      var lp = pt(m, R + 24);
+      ctx.fillStyle = "rgba(74,110,140,.86)";
+      ctx.fillText(DIMS[m].short, lp[0], lp[1]);
+    }
+  }
+
+  /* =========================================================
+     导出长图（纯前端，无外部依赖）
+     ========================================================= */
+  var INLINE_PROPS = [
+    "color","background-color","background-image","background-size","background-position","background-repeat",
+    "border-top-width","border-right-width","border-bottom-width","border-left-width",
+    "border-top-style","border-right-style","border-bottom-style","border-left-style",
+    "border-top-color","border-right-color","border-bottom-color","border-left-color",
+    "border-top-left-radius","border-top-right-radius","border-bottom-left-radius","border-bottom-right-radius",
+    "box-shadow","text-shadow",
+    "padding-top","padding-right","padding-bottom","padding-left",
+    "margin-top","margin-right","margin-bottom","margin-left",
+    "font-family","font-size","font-weight","font-style","line-height","letter-spacing",
+    "text-align","text-decoration-line","white-space","word-break","overflow-wrap",
+    "display","flex-direction","flex-wrap","flex-grow","flex-shrink","flex-basis",
+    "align-items","align-self","justify-content","gap","row-gap","column-gap",
+    "width","height","min-width","max-width","min-height","max-height","box-sizing",
+    "opacity","position","top","right","bottom","left","transform","overflow","vertical-align","order"
+  ];
+
+  function inlineStyles(src, dst){
+    var cs = window.getComputedStyle(src);
+    var s = "";
+    for (var i = 0; i < INLINE_PROPS.length; i++){
+      var v = cs.getPropertyValue(INLINE_PROPS[i]);
+      if (v) s += INLINE_PROPS[i] + ":" + v + ";";
+    }
+    dst.setAttribute("style", s);
+    var sk = src.children, dk = dst.children;
+    for (var j = 0; j < sk.length && j < dk.length; j++) inlineStyles(sk[j], dk[j]);
+  }
+
+  function buildImage(){
+    var node = document.getElementById("report-root");
+    if (!node) throw new Error("no report");
+
+    var rect = node.getBoundingClientRect();
+    var W = Math.ceil(rect.width);
+    var H = Math.ceil(rect.height);
+    var PAD_X = 16, PAD_Y = 20;
+    var OW = W + PAD_X * 2;
+    var OH = H + PAD_Y * 2;
+
+    var clone = node.cloneNode(true);
+    inlineStyles(node, clone);
+
+    // canvas 用图片替换（序列化不会带位图）
+    var srcCanvas = node.querySelector("canvas");
+    var dstCanvas = clone.querySelector("canvas");
+    if (srcCanvas && dstCanvas){
+      try {
+        var im = document.createElement("img");
+        im.setAttribute("src", srcCanvas.toDataURL("image/png"));
+        im.setAttribute("style", dstCanvas.getAttribute("style") || "");
+        dstCanvas.parentNode.replaceChild(im, dstCanvas);
+      } catch(e){}
+    }
+
+    var wrap = document.createElement("div");
+    wrap.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    wrap.setAttribute("style",
+      "width:" + OW + "px;box-sizing:border-box;padding:" + PAD_Y + "px " + PAD_X + "px;" +
+      "background-color:#e6f3fd;" +
+      "background-image:linear-gradient(168deg,#eaf6ff 0%,#dceffc 48%,#e9f5fd 100%);");
+    wrap.appendChild(clone);
+
+    var svg = '<?xml version="1.0" encoding="UTF-8"?>' +
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + OW + '" height="' + OH + '">' +
+      '<foreignObject x="0" y="0" width="' + OW + '" height="' + OH + '">' +
+      new XMLSerializer().serializeToString(wrap) +
+      '</foreignObject></svg>';
+
+    return new Promise(function(resolve, reject){
+      var blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var image = new Image();
+      image.onload = function(){
+        try {
+          var scale = 2;
+          var MAXPIX = 16000;
+          if (OH * scale > MAXPIX) scale = MAXPIX / OH;
+          if (OW * scale > 2400) scale = Math.min(scale, 2400 / OW);
+          if (scale < 1) scale = 1;
+
+          var cv = document.createElement("canvas");
+          cv.width = Math.round(OW * scale);
+          cv.height = Math.round(OH * scale);
+          var ctx = cv.getContext("2d");
+          ctx.fillStyle = "#e6f3fd";
+          ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.setTransform(scale, 0, 0, scale, 0, 0);
+          ctx.drawImage(image, 0, 0, OW, OH);
+          URL.revokeObjectURL(url);
+
+          // 个别 iOS / 微信内核会把 foreignObject 画成空白，这里做一次抽检
+          try {
+            var blank = 0;
+            var pts = [[0.5,0.22],[0.5,0.42],[0.5,0.62],[0.5,0.82],[0.25,0.5]];
+            for (var si = 0; si < pts.length; si++){
+              var dm = ctx.getImageData(
+                Math.round(cv.width * pts[si][0]),
+                Math.round(cv.height * pts[si][1]), 1, 1).data;
+              if (Math.abs(dm[0]-230) < 3 && Math.abs(dm[1]-243) < 3 && Math.abs(dm[2]-253) < 3) blank++;
+            }
+            if (blank >= 5){ reject(new Error("blank")); return; }
+          } catch(e2){ /* 读不到像素就跳过检测 */ }
+
+          cv.toBlob(function(b){
+            if (!b) return reject(new Error("toBlob failed"));
+            resolve({ blob:b, width:cv.width, height:cv.height });
+          }, "image/png");
+        } catch(err){ URL.revokeObjectURL(url); reject(err); }
+      };
+      image.onerror = function(){ URL.revokeObjectURL(url); reject(new Error("svg load failed")); };
+      image.src = url;
+    });
+  }
+
+  var lastObjectURL = null;
+  var currentLevel = "";
+
+  function showExport(res){
+    var layer = $("export-layer");
+    if (lastObjectURL) URL.revokeObjectURL(lastObjectURL);
+    lastObjectURL = URL.createObjectURL(res.blob);
+    $("export-img").src = lastObjectURL;
+    $("export-dl").href = lastObjectURL;
+    $("export-dl").setAttribute("download", "情感漠视报告_" + (currentLevel ? currentLevel + "_" : "") + new Date().toISOString().slice(0,10) + ".png");
+    layer.classList.add("show");
+    layer.scrollTop = 0;
+  }
+
+  fab.addEventListener("click", function(){
+    var old = fab.textContent;
+    fab.disabled = true;
+    fab.textContent = "生成中…";
+    setTimeout(function(){
+      Promise.resolve().then(buildImage).then(function(res){
+        showExport(res);
+      }).catch(function(err){
+        if (err && err.message === "blank") toast("当前浏览器不支持自动生成，请直接用系统截图。");
+        else toast("生成失败，请直接用系统截图。");
+        console.error(err);
+      }).then(function(){
+        fab.disabled = false;
+        fab.textContent = old;
+      });
+    }, 60);
+  });
+
+  $("export-close").addEventListener("click", function(){
+    $("export-layer").classList.remove("show");
+  });
+
+  /* =========================================================
+     事件
+     ========================================================= */
+  $("btn-start").addEventListener("click", function(){
+    answers = new Array(QUESTIONS.length).fill(-1);
+    idx = 0;
+    show(screenQuiz);
+    render();
+  });
+
+  $("btn-back").addEventListener("click", back);
+
+  $("btn-retry").addEventListener("click", function(){
+    answers = new Array(QUESTIONS.length).fill(-1);
+    idx = 0;
+    show(screenCover);
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (!screenQuiz.classList.contains("active")) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4) choose(n - 1);
+    if (e.key === "Backspace"){ e.preventDefault(); back(); }
+  });
+
+  var rt;
+  window.addEventListener("resize", function(){
+    if (!screenResult.classList.contains("active")) return;
+    clearTimeout(rt);
+    rt = setTimeout(function(){
+      var fills = document.querySelectorAll(".dim-fill");
+      var vals = [];
+      for (var i = 0; i < fills.length; i++) vals.push(parseInt(fills[i].getAttribute("data-w"), 10) || 0);
+      drawRadar(vals);
+    }, 180);
+  });
+
+})();
+</script>
+</body>
+</html>
